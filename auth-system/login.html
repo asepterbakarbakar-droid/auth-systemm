@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Login & Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .video-background video {
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            min-height: 550px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .welcome-section {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 40%;
+            top: -50%;
+            left: -50%;
+            animation: rotate 15s infinite linear;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .welcome-section p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-container {
+            width: 100%;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .form-subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .form-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .form-footer a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        #register-form {
+            display: none;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .user-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .feature-list {
+            text-align: left;
+            margin-top: 30px;
+        }
+
+        .feature-list li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-list i {
+            margin-right: 10px;
+            color: #4cd964;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .welcome-section {
+                padding: 30px 20px;
+            }
+            
+            .form-section {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay muted loop id="bg-video">
+            <source src="purple-knight.3840x2160.mp4" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+        <div class="video-overlay"></div>
+    </div>
+    
+    <div class="container">
+        <div class="welcome-section">
+            <div class="welcome-content">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h1>Selamat Datang</h1>
+                <p>Bergabunglah dengan komunitas kami dan nikmati berbagai fitur eksklusif yang tersedia untuk Anda.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Akses ke konten premium</li>
+                    <li><i class="fas fa-check"></i> Komunitas yang aktif</li>
+                    <li><i class="fas fa-check"></i> Dukungan 24/7</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-container">
+                <!-- Login Form -->
+                <form id="login-form" class="active-form">
+                    <h2 class="form-title">Masuk ke Akun</h2>
+                    <p class="form-subtitle">Silakan masuk dengan akun Anda</p>
+                    
+                    <div id="login-alert"></div>
+                    
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" class="form-control" placeholder="Masukkan email Anda" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <div class="password-container">
+                            <input type="password" id="login-password" class="form-control" placeholder="Masukkan password Anda" required>
+                            <button type="button" class="toggle-password" id="toggle-login-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn" id="login-btn">
+                            <span class="btn-text">Masuk</span>
+                        </button>
+                    </div>
+                    
+                    <div class="form-footer">
+                        <p>Belum punya akun? <a href="#" id="show-register">Daftar di sini</a></p>
+                    </div>
+                </form>
+                
+                <!-- Register Form -->
+                <form id="register-form">
+                    <h2 class="form-title">Buat Akun Baru</h2>
+                    <p class="form-subtitle">Isi data berikut untuk mendaftar</p>
+                    
+                    <div id="register-alert"></div>
+                    
+                    <div class="form-group">
+                        <label for="register-name">Nama Lengkap</label>
+                        <input type="text" id="register-name" class="form-control" placeholder="Masukkan nama lengkap" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" class="form-control" placeholder="Masukkan email Anda" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <div class="password-container">
+                            <input type="password" id="register-password" class="form-control" placeholder="Buat password" required>
+                            <button type="button" class="toggle-password" id="toggle-register-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm-password">Konfirmasi Password</label>
+                        <div class="password-container">
+                            <input type="password" id="confirm-password" class="form-control" placeholder="Konfirmasi password" required>
+                            <button type="button" class="toggle-password" id="toggle-confirm-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn" id="register-btn">
+                            <span class="btn-text">Daftar</span>
+                        </button>
+                    </div>
+                    
+                    <div class="form-footer">
+                        <p>Sudah punya akun? <a href="#" id="show-login">Masuk di sini</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Service dengan error handling yang lebih baik
+        class ApiService {
+            constructor() {
+                this.baseURL = 'http://localhost/auth-system';
+            }
+
+            async request(endpoint, method = 'GET', data = null) {
+                const url = this.baseURL + endpoint;
+                console.log('Making request to:', url);
+                
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+
+                if (data && (method === 'POST' || method === 'PUT')) {
+                    options.body = JSON.stringify(data);
+                }
+
+                try {
+                    const response = await fetch(url, options);
+                    
+                    // Cek jika response adalah HTML (error)
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('text/html')) {
+                        const text = await response.text();
+                        console.error('Server returned HTML instead of JSON:', text.substring(0, 200));
+                        throw new Error('Server error: Received HTML response instead of JSON');
+                    }
+                    
+                    const result = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(result.message || `HTTP error! status: ${response.status}`);
+                    }
+                    
+                    return result;
+                } catch (error) {
+                    console.error('API Request failed:', error);
+                    throw new Error(error.message || 'Koneksi ke server gagal. Pastikan XAMPP running dan path benar.');
+                }
+            }
+
+            async register(userData) {
+                return this.request('/api/register.php', 'POST', userData);
+            }
+
+            async login(credentials) {
+                return this.request('/api/login.php', 'POST', credentials);
+            }
+        }
+
+        // UI Service
+        class UIService {
+            constructor(apiService) {
+                this.apiService = apiService;
+                this.loginForm = document.getElementById('login-form');
+                this.registerForm = document.getElementById('register-form');
+                this.showRegisterLink = document.getElementById('show-register');
+                this.showLoginLink = document.getElementById('show-login');
+                this.loginAlert = document.getElementById('login-alert');
+                this.registerAlert = document.getElementById('register-alert');
+                this.loginBtn = document.getElementById('login-btn');
+                this.registerBtn = document.getElementById('register-btn');
+                
+                this.initEventListeners();
+                this.testConnection();
+            }
+
+            initEventListeners() {
+                // Toggle form
+                this.showRegisterLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.showRegisterForm();
+                });
+
+                this.showLoginLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.showLoginForm();
+                });
+
+                // Toggle password visibility
+                this.initPasswordToggles();
+
+                // Form submissions
+                this.loginForm.addEventListener('submit', (e) => this.handleLogin(e));
+                this.registerForm.addEventListener('submit', (e) => this.handleRegister(e));
+            }
+
+            async testConnection() {
+                try {
+                    console.log('Testing connection to server...');
+                    // Coba akses file yang sederhana dulu
+                    const response = await fetch('http://localhost/auth-system/api/register.php', {
+                        method: 'OPTIONS'
+                    });
+                    console.log('Connection test response:', response.status);
+                } catch (error) {
+                    console.error('Connection test failed:', error);
+                    this.showAlert(this.loginAlert, 
+                        '⚠️ Server tidak dapat diakses. Pastikan XAMPP running dan folder "auth-system" ada di htdocs.', 
+                        'error');
+                }
+            }
+
+            initPasswordToggles() {
+                const toggleButtons = document.querySelectorAll('.toggle-password');
+                
+                toggleButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const input = button.parentElement.querySelector('input');
+                        const icon = button.querySelector('i');
+                        
+                        if (input.type === 'password') {
+                            input.type = 'text';
+                            icon.classList.remove('fa-eye');
+                            icon.classList.add('fa-eye-slash');
+                        } else {
+                            input.type = 'password';
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        }
+                    });
+                });
+            }
+
+            showLoginForm() {
+                this.loginForm.style.display = 'block';
+                this.registerForm.style.display = 'none';
+                this.clearAlerts();
+            }
+
+            showRegisterForm() {
+                this.loginForm.style.display = 'none';
+                this.registerForm.style.display = 'block';
+                this.clearAlerts();
+            }
+
+            showAlert(container, message, type) {
+                container.innerHTML = `
+                    <div class="alert alert-${type}">
+                        ${message}
+                    </div>
+                `;
+            }
+
+            clearAlerts() {
+                this.loginAlert.innerHTML = '';
+                this.registerAlert.innerHTML = '';
+            }
+
+            showLoading(button) {
+                const btnText = button.querySelector('.btn-text');
+                btnText.innerHTML = '<span class="loading"></span> Memproses...';
+                button.disabled = true;
+            }
+
+            hideLoading(button, text) {
+                const btnText = button.querySelector('.btn-text');
+                btnText.textContent = text;
+                button.disabled = false;
+            }
+
+            async handleLogin(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                if (!email || !password) {
+                    this.showAlert(this.loginAlert, 'Email dan password harus diisi', 'error');
+                    return;
+                }
+
+                this.showLoading(this.loginBtn);
+                
+                try {
+                    const result = await this.apiService.login({ email, password });
+                    this.showAlert(this.loginAlert, result.message, 'success');
+                    
+                    setTimeout(() => {
+                        this.hideLoading(this.loginBtn, 'Masuk');
+                        alert(`Login berhasil! Selamat datang.`);
+                        // Untuk testing, kita tidak redirect dulu
+                        // window.location.href = 'dashboard.html';
+                    }, 1500);
+                    
+                } catch (error) {
+                    this.hideLoading(this.loginBtn, 'Masuk');
+                    this.showAlert(this.loginAlert, error.message, 'error');
+                }
+            }
+
+            async handleRegister(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('register-name').value;
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                if (!name || !email || !password || !confirmPassword) {
+                    this.showAlert(this.registerAlert, 'Semua field harus diisi', 'error');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    this.showAlert(this.registerAlert, 'Konfirmasi password tidak sesuai', 'error');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    this.showAlert(this.registerAlert, 'Password harus minimal 6 karakter', 'error');
+                    return;
+                }
+
+                this.showLoading(this.registerBtn);
+                
+                try {
+                    const result = await this.apiService.register({ name, email, password });
+                    this.showAlert(this.registerAlert, result.message, 'success');
+                    
+                    setTimeout(() => {
+                        this.hideLoading(this.registerBtn, 'Daftar');
+                        this.showLoginForm();
+                        document.getElementById('login-email').value = email;
+                        this.showAlert(this.loginAlert, 'Registrasi berhasil! Silakan login.', 'success');
+                    }, 1500);
+                    
+                } catch (error) {
+                    this.hideLoading(this.registerBtn, 'Daftar');
+                    this.showAlert(this.registerAlert, error.message, 'error');
+                }
+            }
+        }
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', () => {
+            const apiService = new ApiService();
+            const uiService = new UIService(apiService);
+            
+            // Debug info
+            console.log('Application initialized');
+            console.log('Make sure:');
+            console.log('1. XAMPP Apache and MySQL are running');
+            console.log('2. Folder "auth-system" exists in htdocs');
+            console.log('3. Database "auth_system" and table "users" are created');
+        });
+    </script>
+</body>
+</html>

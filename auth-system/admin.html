@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Daftar User</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .admin-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .admin-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .admin-content {
+            padding: 30px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .users-table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table-header h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .password-cell {
+            font-family: 'Courier New', monospace;
+            position: relative;
+        }
+
+        .show-password {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #5a6268;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .search-box {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 300px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .admin-content {
+                padding: 15px;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 10px 5px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1><i class="fas fa-users-cog"></i> Admin Panel</h1>
+            <p>Manajemen Data Pengguna Terdaftar</p>
+        </div>
+        
+        <div class="admin-content">
+            <div id="admin-alert"></div>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-users">0</div>
+                    <div class="stat-label">Total Pengguna</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="today-registrations">0</div>
+                    <div class="stat-label">Registrasi Hari Ini</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="active-users">0</div>
+                    <div class="stat-label">Pengguna Aktif</div>
+                </div>
+            </div>
+
+            <div class="users-table-container">
+                <div class="table-header">
+                    <h2><i class="fas fa-list"></i> Daftar Semua Pengguna</h2>
+                    <input type="text" id="search-users" class="search-box" placeholder="Cari pengguna...">
+                </div>
+                
+                <div id="users-table">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Memuat data pengguna...
+                    </div>
+                </div>
+            </div>
+            
+            <a href="index.html" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Kembali ke Login
+            </a>
+        </div>
+    </div>
+
+<script>
+    class AdminService {
+        constructor() {
+            this.baseURL = 'http://localhost/auth-system';
+        }
+
+        async getAllUsers() {
+            try {
+                console.log('Fetching users from:', this.baseURL + '/api/get_users.php');
+                
+                const response = await fetch(this.baseURL + '/api/get_users.php');
+                
+                // Check if response is HTML (error page)
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('text/html')) {
+                    const text = await response.text();
+                    console.error('Server returned HTML instead of JSON:', text.substring(0, 200));
+                    throw new Error('Server error: Received HTML page instead of JSON');
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to fetch users');
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                throw new Error('Gagal memuat data pengguna: ' + error.message);
+            }
+        }
+
+        async deleteUser(userId) {
+            try {
+                console.log('Deleting user ID:', userId);
+                
+                const response = await fetch(this.baseURL + '/api/delete_user.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: userId })
+                });
+
+                // Check if response is HTML (error page)
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('text/html')) {
+                    const text = await response.text();
+                    console.error('Server returned HTML:', text.substring(0, 500));
+                    throw new Error('Server error: Received HTML page instead of JSON');
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const text = await response.text();
+                let data;
+                
+                try {
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError);
+                    console.error('Raw response:', text);
+                    throw new Error('Invalid JSON response from server');
+                }
+                
+                return data;
+                
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                throw new Error('Gagal menghapus user: ' + error.message);
+            }
+        }
+    }
+
+    class AdminUI {
+        constructor() {
+            this.adminService = new AdminService();
+            this.usersTable = document.getElementById('users-table');
+            this.adminAlert = document.getElementById('admin-alert');
+            this.searchInput = document.getElementById('search-users');
+            this.totalUsers = document.getElementById('total-users');
+            this.todayRegistrations = document.getElementById('today-registrations');
+            this.activeUsers = document.getElementById('active-users');
+            this.isLoading = false;
+            
+            this.init();
+        }
+
+        init() {
+            this.loadUsers();
+            this.setupEventListeners();
+        }
+
+        setupEventListeners() {
+            this.searchInput.addEventListener('input', (e) => {
+                this.filterUsers(e.target.value);
+            });
+        }
+
+        async loadUsers() {
+            if (this.isLoading) return;
+            
+            this.isLoading = true;
+            this.showAlert('Memuat data pengguna...', 'success');
+            
+            try {
+                const data = await this.adminService.getAllUsers();
+                this.displayUsers(data.users || []);
+                this.updateStats(data.users || []);
+                this.showAlert('Data berhasil dimuat', 'success');
+            } catch (error) {
+                console.error('Load users error:', error);
+                this.showAlert(error.message, 'error');
+                this.displaySampleData();
+            } finally {
+                this.isLoading = false;
+            }
+        }
+
+        displayUsers(users) {
+            if (users.length === 0) {
+                this.usersTable.innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-info-circle"></i> Tidak ada data pengguna
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Password</th>
+                            <th>Tanggal Daftar</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            users.forEach(user => {
+                const registerDate = new Date(user.created_at).toLocaleDateString('id-ID');
+                const escapedPassword = this.escapeHtml(user.password);
+                const escapedName = this.escapeHtml(user.name);
+                const escapedEmail = this.escapeHtml(user.email);
+                
+                html += `
+                    <tr data-user-id="${user.id}">
+                        <td>${user.id}</td>
+                        <td>${escapedName}</td>
+                        <td>${escapedEmail}</td>
+                        <td class="password-cell">
+                            <span class="password-text">••••••••</span>
+                            <button class="show-password" onclick="togglePassword(this, '${escapedPassword}')" title="Tampilkan password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                        <td>${registerDate}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-danger" onclick="deleteUser(${user.id})" title="Hapus user">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                            <button class="btn btn-primary" onclick="editUser(${user.id})" title="Edit user">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            this.usersTable.innerHTML = html;
+        }
+
+        displaySampleData() {
+            const sampleUsers = [
+                {
+                    id: 1,
+                    name: "Admin User",
+                    email: "admin@example.com",
+                    password: "hashed_password_123",
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    name: "Test User",
+                    email: "test@example.com", 
+                    password: "hashed_password_456",
+                    created_at: new Date(Date.now() - 86400000).toISOString() // 1 day ago
+                },
+                {
+                    id: 3,
+                    name: "Demo User",
+                    email: "demo@example.com",
+                    password: "hashed_password_789",
+                    created_at: new Date(Date.now() - 172800000).toISOString() // 2 days ago
+                }
+            ];
+
+            this.displayUsers(sampleUsers);
+            this.updateStats(sampleUsers);
+            this.showAlert('⚠️ Menggunakan data sample. Pastikan file PHP backend sudah terinstall dengan benar.', 'error');
+        }
+
+        updateStats(users) {
+            const total = users.length;
+            this.totalUsers.textContent = total;
+            
+            const today = new Date().toDateString();
+            const todayUsers = users.filter(user => {
+                try {
+                    return new Date(user.created_at).toDateString() === today;
+                } catch (e) {
+                    return false;
+                }
+            });
+            this.todayRegistrations.textContent = todayUsers.length;
+            
+            this.activeUsers.textContent = total;
+        }
+
+        filterUsers(searchTerm) {
+            const rows = this.usersTable.querySelectorAll('tbody tr');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm.toLowerCase())) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Update counter
+            const counter = document.getElementById('filter-counter') || (() => {
+                const counterEl = document.createElement('div');
+                counterEl.id = 'filter-counter';
+                counterEl.style.cssText = 'color: #666; font-size: 14px; margin-top: 10px;';
+                this.usersTable.parentNode.appendChild(counterEl);
+                return counterEl;
+            })();
+            
+            if (searchTerm) {
+                counter.textContent = `Menampilkan ${visibleCount} dari ${rows.length} pengguna`;
+                this.totalUsers.textContent = `${visibleCount} (difilter)`;
+            } else {
+                counter.textContent = `Total ${rows.length} pengguna`;
+                this.totalUsers.textContent = rows.length;
+            }
+        }
+
+        togglePassword(button, realPassword) {
+            const passwordText = button.parentElement.querySelector('.password-text');
+            const icon = button.querySelector('i');
+            
+            if (passwordText.textContent === '••••••••') {
+                passwordText.textContent = realPassword;
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                button.title = 'Sembunyikan password';
+                button.style.color = '#dc3545';
+            } else {
+                passwordText.textContent = '••••••••';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                button.title = 'Tampilkan password';
+                button.style.color = '#667eea';
+            }
+        }
+
+        async deleteUser(userId) {
+            if (!confirm(`Apakah Anda yakin ingin menghapus user dengan ID ${userId}?`)) {
+                return;
+            }
+
+            try {
+                this.showAlert('Menghapus user...', 'success');
+                const result = await this.adminService.deleteUser(userId);
+                
+                if (result.success) {
+                    this.showAlert(`✅ User dengan ID ${userId} berhasil dihapus! Memuat ulang data...`, 'success');
+                    
+                    // Remove row immediately for better UX
+                    const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+                    if (row) {
+                        row.style.backgroundColor = '#f8d7da';
+                        setTimeout(() => {
+                            row.remove();
+                            this.updateStatsAfterDelete();
+                        }, 1000);
+                    } else {
+                        // Fallback: reload all data
+                        setTimeout(() => {
+                            this.loadUsers();
+                        }, 1500);
+                    }
+                } else {
+                    this.showAlert(`❌ Gagal menghapus user: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                this.showAlert(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        updateStatsAfterDelete() {
+            const rows = this.usersTable.querySelectorAll('tbody tr');
+            const total = rows.length;
+            this.totalUsers.textContent = total;
+            this.activeUsers.textContent = total;
+            
+            // Update today registrations
+            const today = new Date().toDateString();
+            let todayCount = 0;
+            rows.forEach(row => {
+                const dateCell = row.cells[4].textContent;
+                if (new Date(dateCell).toDateString() === today) {
+                    todayCount++;
+                }
+            });
+            this.todayRegistrations.textContent = todayCount;
+        }
+
+        showAlert(message, type) {
+            this.adminAlert.innerHTML = `
+                <div class="alert alert-${type}">
+                    <strong>${type === 'success' ? '✅' : '❌'}</strong> ${message}
+                </div>
+            `;
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (this.adminAlert.innerHTML.includes(message)) {
+                        this.adminAlert.innerHTML = '';
+                    }
+                }, 5000);
+            }
+        }
+
+        escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    }
+
+    // Global variables
+    let adminUI = null;
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            adminUI = new AdminUI();
+            console.log('✅ Admin panel initialized successfully');
+        } catch (error) {
+            console.error('❌ Failed to initialize admin panel:', error);
+            document.getElementById('admin-alert').innerHTML = `
+                <div class="alert alert-error">
+                    <strong>❌</strong> Gagal memuat admin panel: ${error.message}
+                </div>
+            `;
+        }
+    });
+
+    // Global functions for onclick handlers
+    function deleteUser(userId) {
+        if (adminUI) {
+            adminUI.deleteUser(userId);
+        } else {
+            alert('Admin UI belum siap. Silakan refresh halaman.');
+        }
+    }
+
+    function togglePassword(button, realPassword) {
+        if (adminUI) {
+            adminUI.togglePassword(button, realPassword);
+        }
+    }
+
+    function editUser(userId) {
+        alert(`Fitur edit user ID ${userId} akan segera tersedia!`);
+        // Implement edit functionality here
+    }
+
+    function refreshData() {
+        if (adminUI) {
+            adminUI.loadUsers();
+        }
+    }
+
+    // Export for global access (optional)
+    window.AdminUI = AdminUI;
+    window.adminUI = adminUI;
+    window.deleteUser = deleteUser;
+    window.togglePassword = togglePassword;
+    window.editUser = editUser;
+    window.refreshData = refreshData;
+
+    console.log('🚀 Admin panel JavaScript loaded successfully');
+    console.log('📝 Available global functions: deleteUser(), togglePassword(), editUser(), refreshData()');
+</script>
+</body>
+</html>
